@@ -1,4 +1,8 @@
-import React, { useState, useRef } from "react";
+// By pressing enter, the user submits the name of the city which updates the DOM with the temperature, weather condition, image of day or night and weather condition icon.
+// press enter to search
+// display day or night
+
+import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
 
 export default function App() {
@@ -6,6 +10,8 @@ export default function App() {
   const [locationKey, setLocationKey] = useState("locationKey");
   const [city, setCity] = useState("");
   const [currentWeather, setCurrentWeather] = useState("");
+  const [temp, setTemp] = useState("");
+  const [isDay, setIsDay] = useState(null);
   const inputValue = useRef(null);
 
   const getWeather = key => {
@@ -17,7 +23,13 @@ export default function App() {
         return res.json();
       })
       .then(data => {
-        return setCurrentWeather(data[0].WeatherText);
+        console.log(data);
+        setCurrentWeather(data[0].WeatherText);
+        setTemp(
+          data[0].Temperature.Imperial.Value + data[0].Temperature.Imperial.Unit
+        );
+        setIsDay(data[0].IsDayTime);
+        return;
       });
   };
 
@@ -39,6 +51,7 @@ export default function App() {
       {/* <p>location key: {locationKey}</p> */}
       <p>City: {city}</p>
       <p>Current Weather: {currentWeather}</p>
+      <p>Temp: {temp}</p>
       <input ref={inputValue} placeholder="Enter City"></input>
       <button onClick={() => getLocationKey(inputValue.current.value)}>
         Search
