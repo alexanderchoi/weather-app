@@ -1,26 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useRef } from "react";
+import "./App.css";
 
-function App() {
+export default function App() {
+  const apikey = `WePKciLBza3MMOL6jjDbBU3ztMrMAAoF`;
+  const [locationKey, setLocationKey] = useState("locationKey");
+  const [city, setCity] = useState("");
+  const [currentWeather, setCurrentWeather] = useState("");
+  const inputValue = useRef(null);
+
+  const getWeather = key => {
+    key = key.toString();
+    fetch(
+      `http://dataservice.accuweather.com/currentconditions/v1/351409?apikey=${apikey}`
+    )
+      .then(res => {
+        return res.json();
+      })
+      .then(data => {
+        return setCurrentWeather(data[0].WeatherText);
+      });
+  };
+
+  const getLocationKey = city => {
+    setCity(city);
+    fetch(
+      `http://dataservice.accuweather.com/locations/v1/cities/search?apikey=${apikey}&q=${city}`
+    )
+      .then(res => {
+        return res.json();
+      })
+      .then(data => {
+        setLocationKey(data[0].Key);
+        getWeather(data[0].Key);
+      });
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {/* <p>location key: {locationKey}</p> */}
+      <p>City: {city}</p>
+      <p>Current Weather: {currentWeather}</p>
+      <input ref={inputValue} placeholder="Enter City"></input>
+      <button onClick={() => getLocationKey(inputValue.current.value)}>
+        Search
+      </button>
     </div>
   );
 }
-
-export default App;
